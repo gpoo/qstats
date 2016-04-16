@@ -113,8 +113,12 @@ class Filter:
             t = ThreadIterator(ctr)
             s = re.sub('\s+', ' ', subj)
             for c, depth in t.next():
+                m = self.parse_message(c.message)
+                s_generic, topic = check_subject(m['subject'])
+
                 print depth * ' ',
-                print s
+                print depth, s_generic, topic, m['subject']
+
 
 class ThreadIterator():
     def __init__(self, root):
