@@ -5,6 +5,15 @@ import sys
 import codecs
 from qstats.qstats import parse, print_threads, print_roots, save, load
 from qstats.filter import Filter
+from qstats.ui import UI
+
+
+def do_gui(fname, aliases, verbose=0):
+    o = load(fname)
+    # p = Filter(o, aliases)
+    ui = UI(o, 'output_file')
+    ui.main()
+
 
 def do_filter(fname, aliases, verbose=0):
     o = load(fname)
@@ -63,25 +72,35 @@ def main():
     parse_parser.add_argument("files", nargs="+")
     parse_parser.add_argument('-s', '--save', dest='save')
 
+    gui_parser = subparsers.add_parser("gui", help=help_parse)
+    gui_parser.add_argument("file", help='MBox Pickled')
+    gui_parser.add_argument('-a', '--aliases', dest='aliases')
+
     # Parse
     opts = arger.parse_args()
 
-    if opts.command == 'filter':
+    # Commands in alphabetical order
+    if opts.command == 'gui':
+#        print "Filter command"
+#        print "file: %s" % opts.file
+        do_gui(opts.file, opts.aliases, opts.verbose)
+
+    elif opts.command == 'filter':
 #        print "Filter command"
 #        print "file: %s" % opts.file
         do_filter(opts.file, opts.aliases, opts.verbose)
-
-    elif opts.command == 'report':
-#        print 'Report command'
-#        print 'file: %s' % opts.file
-#        print 'root only: %s' % opts.root
-        do_load(opts.file, opts.root, opts.verbose)
 
     elif opts.command == "parse":
 #        print "file(s): %s" % opts.files
 #        print "save: %s" % opts.save
 #        print "verbose: %d" % opts.verbose
         do_parse(opts.files, opts.save, opts.verbose)
+
+    elif opts.command == 'report':
+#        print 'Report command'
+#        print 'file: %s' % opts.file
+#        print 'root only: %s' % opts.root
+        do_load(opts.file, opts.root, opts.verbose)
 
     else:
         # argparse will error on unexpected commands, but
