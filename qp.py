@@ -44,7 +44,7 @@ def do_parse(files, save_file, verbose=False):
 
 
 def main():
-    sys.stdout=codecs.getwriter('utf-8')(sys.stdout)
+    sys.stdout = codecs.getwriter('utf-8')(sys.stdout)
 
     help_parse = 'Parse compressed mailbox archives'
 
