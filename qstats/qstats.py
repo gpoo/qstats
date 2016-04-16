@@ -1,9 +1,11 @@
 #!/usr/bin/env python
 
 import sys
+sys.path.insert(0, '/home/gpoo/code/research/ml/mailingliststat')
+
 import gzip
 import pickle
-from .strictmbox import CustomMailbox
+from pymlstats.strictmbox import CustomMailbox
 from .jwzthreading import make_message, thread
 
 
