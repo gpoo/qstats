@@ -81,25 +81,15 @@ def main():
 
     # Commands in alphabetical order
     if opts.command == 'gui':
-#        print "Filter command"
-#        print "file: %s" % opts.file
         do_gui(opts.file, opts.aliases, opts.verbose)
 
     elif opts.command == 'filter':
-#        print "Filter command"
-#        print "file: %s" % opts.file
         do_filter(opts.file, opts.aliases, opts.verbose)
 
     elif opts.command == "parse":
-#        print "file(s): %s" % opts.files
-#        print "save: %s" % opts.save
-#        print "verbose: %d" % opts.verbose
         do_parse(opts.files, opts.save, opts.verbose)
 
     elif opts.command == 'report':
-#        print 'Report command'
-#        print 'file: %s' % opts.file
-#        print 'root only: %s' % opts.root
         do_load(opts.file, opts.root, opts.verbose)
 
     else:
