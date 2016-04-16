@@ -93,6 +93,19 @@ class Filter:
 
         return addresses
 
+    def parse_message(self, threaded_message):
+        parser = ParseMessage()
+        text = email.message_from_string(str(threaded_message))
+        message = parser.parse_message(text)
+
+        msg_subject = message['subject']
+        msg_subject = re.sub('\[openstack\-dev\]', '', msg_subject,
+                             flags=re.IGNORECASE)
+        msg_subject = re.sub(r'\s+', ' ', msg_subject)
+        message['subject'] = msg_subject
+
+        return message
+
     def walk2(self, container):
         L = list(container.items())
         L.sort()
@@ -120,6 +133,20 @@ class ThreadIterator():
         for c in curr.children:
             for x in self._next(c, depth+1):
                 yield x
+
+
+def parse_message(threaded_message):
+    parser = ParseMessage()
+    text = email.message_from_string(str(threaded_message))
+    message = parser.parse_message(text)
+
+    msg_subject = message['subject']
+    msg_subject = re.sub('\[openstack\-dev\]', '', msg_subject,
+                         flags=re.IGNORECASE)
+    msg_subject = re.sub(r'\s+', ' ', msg_subject)
+    message['subject'] = msg_subject.strip()
+
+    return message
 
 
 def check_subject(subject):
