@@ -200,7 +200,7 @@ class UI:
         model, storeiter = selection.get_selected()
         first_entry = True
 
-        if not iter:
+        if not storeiter:
             return
 
         d = {
