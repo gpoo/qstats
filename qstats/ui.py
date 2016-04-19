@@ -164,28 +164,7 @@ class UI:
         self.remark = builder.get_object('textview_remarks').get_buffer()
         # self.remark.connect('changed', self.on_remark_changed)
 
-        grid = builder.get_object('box1')
-        self.test = GtkSource.Buffer()
-        # self.test.set_language(self.lm.get_language('html'))
-        # self.lm = GtkSource.LanguageManager()
-
-        self.sourceview_test = GtkSource.View.new_with_buffer(self.test)
-        self.sourceview_test.set_wrap_mode(Gtk.WrapMode.WORD_CHAR)
-        # self.sourceview_test.set_show_line_marks(True)
-        self.add_accelerator(self.sourceview_test, '<alt>o', 'grab-focus')
-        grid.pack_start(self.sourceview_test, True, True, True)
-
-        self.thread_data = {
-            'userid': builder.get_object('l_user'),
-            'url': builder.get_object('link'),
-            'n_messages': builder.get_object('l_size'),
-            'duration': builder.get_object('l_forks'),
-            'n_participants': builder.get_object('l_commits'),
-            'dstart': builder.get_object('l_files'),
-            'dend': builder.get_object('l_comments'),
-            'subject': builder.get_object('l_created'),
-            'name': builder.get_object('l_updated'),
-        }
+        self.details = builder.get_object('textview_details').get_buffer()
 
         self.window.add_events(Gdk.EventType.KEY_PRESS |
                                Gdk.EventType.KEY_RELEASE)
@@ -277,19 +256,6 @@ class UI:
 
         print([x[1] for x in participants])
 
-        for w in ['url', 'dstart', 'dend', 'name', 'n_participants',
-                  'n_messages', 'duration', 'subject']:
-            widget = self.thread_data[w]
-            if w == 'url':
-                widget.set_uri(d[w])
-                # widget.set_label('detail')
-                # continue
-            elif w == 'name':
-                widget.set_label('{} <{}>'.format(d[w], d['email']))
-                continue
-
-            widget.set_label(str(d[w]))
-
         text = 'From {} to {}\n{}\n' \
                'Started by: {} <{}>\n' \
                'Msgs: {}, Participants: {}\n' \
@@ -298,10 +264,10 @@ class UI:
                            d['name'], d['email'],
                            d['n_messages'], d['n_participants'],
                            d['subject'], d['url'])
-        start, end = self.test.get_bounds()
-        self.test.delete(start, end)
-        end = self.test.get_end_iter()
-        self.test.insert(end, text)
+        start, end = self.details.get_bounds()
+        self.details.delete(start, end)
+        end = self.details.get_end_iter()
+        self.details.insert(end, text)
 
         return
         ''' DELETE from here to the end of the method '''
