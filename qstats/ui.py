@@ -198,7 +198,6 @@ class UI:
 
     def select_row(self, selection, *data):
         model, storeiter = selection.get_selected()
-        first_entry = True
 
         if not storeiter:
             return
@@ -241,9 +240,13 @@ class UI:
                                                    'count': 0})
             participants[sender_email]['count'] += 1
 
-            if i == 1:
+            if i == 1:  # First entry
                 d['name'], d['email'] = sender_name, sender_email
                 min_date, max_date = msg['date'], msg['date']
+
+                path = Gtk.TreePath.new_from_string('0')
+                self.selinfo_thread.select_path(path)
+                first_entry = False
 
             min_date = msg['date'] if msg['date'] < min_date else min_date
             max_date = msg['date'] if msg['date'] > max_date else max_date
