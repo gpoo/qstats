@@ -197,7 +197,6 @@ class UI:
         return self.cache_filtered_subject[subject]
 
     def select_row(self, selection, *data):
-        model_detail, iter = selection.get_selected()
         model, storeiter = selection.get_selected()
         first_entry = True
 
@@ -216,7 +215,6 @@ class UI:
             'subject': 'subject'
         }
 
-        self.model_files.clear()
         self.model_thread.clear()
 
         # subject = model.get_value(storeiter, 0)
@@ -270,106 +268,6 @@ class UI:
         self.details.delete(start, end)
         end = self.details.get_end_iter()
         self.details.insert(end, text)
-
-        return
-        ''' DELETE from here to the end of the method '''
-        thread_id = model_detail.get_value(iter, 0)
-
-        d = self.threads[thread_id]
-        print(d['topics'])
-        for message_id in self.get_message_id_by_subject(d['subject']):
-            if len(message_id) > 1:
-                print('Error: ', message_id)
-                continue
-
-            msg_id = message_id[0]
-
-            metadata = [m for m in self.db.get_metadata(msg_id)]
-#            if len(metadata) > 1:
-#                print('Error: TOO_MANY_FROM', msg_id)
-#                continue
-            # Results have the format: (type_of_recipient, email_address)
-            # type can be: From, To, Cc
-            mail_from = metadata[0][1] if 'From' in metadata[0] else None
-            mail_date = metadata[0][2] if 'From' in metadata[0] else None
-            print(mail_date.isoformat())
-            # ','.join([m[1] for m in metadata if 'From' in m[0]])
-            # mail_to = ','.join([m[1] for m in metadata if 'To' in m[0]])
-            # mail_cc = ','.join([m[1] for m in metadata if 'Cc' in m[0]])
-
-            # self.check_subject(d['subject'])
-
-            iter = self.model_files.append()
-            # self.model_files.set_value(iter, 0, msg_id)
-            self.model_files.set_value(iter, 0, mail_from)
-            # 1 is to store any data not shown, but eventualy used
-            # self.model_files.set_value(iter, 1, d['duration'])
-            self.model_files.set_value(iter, 2, mail_date.isoformat())
-            self.model_files.set_value(iter, 3, d['n_messages'])
-            self.model_files.set_value(iter, 4, d['n_participants'])
-            self.model_files.set_value(iter, 5, thread_id)
-            self.model_files.set_value(iter, 6, msg_id)
-
-        for k in ['url', 'dstart', 'dend', 'name', 'n_participants',
-                  'n_messages', 'duration', 'subject']:
-            widget = self.thread_data[k]
-            if k == 'url':
-                widget.set_uri(d[k])
-                # widget.set_label('detail')
-                # continue
-            elif k == 'name':
-                widget.set_label('{} <{}>'.format(d[k], d['email']))
-                continue
-
-            widget.set_label(str(d[k]))
-
-        if first_entry:
-            path = Gtk.TreePath.new_from_string('0')
-            self.selinfo_files.select_path(path)
-            first_entry = False
-
-#         if detail in self.index:
-#             self.set_content_type(detail)
-
-#            for fname in self.index[detail]:
-#                short_name = os.path.basename(fname)
-#                short_name = short_name.replace('{}_'.format(detail), '', 1)
-#
-#                files = self.metadata[detail]['files']
-#                try:
-#                    lang, size, lines = files[short_name][0:3]
-#                except KeyError:
-#                    print('{}: {} not found'.format(detail, files),
-#                          file=sys.stderr)
-#                    lang, size, lines = ('', 0, 0)
-#
-#                iter = self.model_files.append()
-#                self.model_files.set_value(iter, 0, short_name)
-#                self.model_files.set_value(iter, 1, fname)
-#                self.model_files.set_value(iter, 2, lang or '---')
-#                self.model_files.set_value(iter, 3, size)
-#                self.model_files.set_value(iter, 4, lines)
-#                self.model_files.set_value(iter, 5, detail)
-#
-#                if first_entry:
-#                    path = Gtk.TreePath.new_from_string('0')
-#                    self.selinfo_files.select_path(path)
-#                    fist_entry = False
-#
-#        data = self.metadata[detail]['data']
-#        for k, v in data.items():
-#            if k not in self.thread_data:
-#                print('{} not in thread_data'.format(k))
-#                continue
-#
-#            widget = self.threaddata[k]
-#
-#            if k == 'url':
-#                widget.set_label('detail')
-#                widget.set_uri(v)
-#                continue
-#
-#            widget.set_label(str(v))
 
     def set_content_type(self, gistid):
         self.in_progress = True
