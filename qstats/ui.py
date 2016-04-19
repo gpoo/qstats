@@ -311,50 +311,6 @@ class UI:
         end = self.textbuffer.get_end_iter()
         self.textbuffer.insert(end, body)
 
-    def select_row_files(self, selection, *data):
-        ''' DELETE '''
-        model, iter = selection.get_selected()
-
-        if not iter:
-            return
-
-        message_id = model.get_value(iter, 6)
-        body = [b for b in self.db.get_body(message_id)]
-
-        if len(body) == 0:
-            print('Error (NO BODY):', message_id)
-            return
-
-        if len(body) > 1:
-            print('Error (REPEATED MESSAGE ID):', message_id, body)
-
-        body = body[0][0]
-
-        start, end = self.textbuffer.get_bounds()
-        self.textbuffer.delete(start, end)
-        end = self.textbuffer.get_end_iter()
-        self.textbuffer.insert(end, body)
-
-        # fname = model.get_value(iter, 1)
-        # lang = model.get_value(iter, 2).replace('---', '')
-        # self.load_file(fname, lang)
-
-    def load_file(self, fname, lang):
-        ext = os.path.splitext(fname)[1][1:].lower()
-        lang = lang.lower() or ext
-        lang = lang if lang not in ('javascript', 'shell') else ext
-        lang = lang if lang not in ('C#') else 'c-sharp'
-        self.textbuffer.set_language(self.lm.get_language(lang))
-
-        try:
-            with codecs.open(fname, 'rU', 'utf-8') as f:
-                start, end = self.textbuffer.get_bounds()
-                self.textbuffer.delete(start, end)
-                end = self.textbuffer.get_end_iter()
-                self.textbuffer.insert(end, f.read())
-        except IOError:
-            print('Error loading {}'.format(fname), file=sys.stderr)
-
     def on_content_type_toggled(self, widget, *args):
         # Do something only if the user toggled the check box,
         # not the program
