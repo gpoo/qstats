@@ -40,8 +40,6 @@ class UI:
     APP_NAME = 'Discussions\' Classifier'
 
     def __init__(self, threads, output_file, ui='qstats.ui', *args):
-        # self.index = files_location
-        # self.metadata = metadata
         self.threads = threads
         self.output_file = output_file
         self.content_type = {}
@@ -86,14 +84,6 @@ class UI:
         self.list_threads.append_column(col)
 
         sw.add(self.list_threads)
-
-        # Old list files
-        self.model_files = Gtk.ListStore(str, str, str, int, int, int, str)
-        self.list_files = Gtk.TreeView()
-        self.list_files.set_model(self.model_files)
-        self.add_accelerator(self.list_files, '<alt>f', 'grab-focus')
-        self.selinfo_files = self.list_files.get_selection()
-        self.selinfo_files.connect('changed', self.select_row_files)
 
         # Messages per thread
         sw = builder.get_object('sw_treeview_detail')
@@ -210,14 +200,11 @@ class UI:
             'dend': 'end',
             'name': 'name',
             'email': 'email',
-            'duration': 'duration',
-            'subject': 'subject'
+            'duration': 'duration'
         }
 
         self.model_thread.clear()
 
-        # subject = model.get_value(storeiter, 0)
-        # container = model.get_value(storeiter, 1)
         subject, container = model[storeiter][:2]
         self.subject.set_text(subject)
 
@@ -255,7 +242,6 @@ class UI:
 
         d['n_participants'] = len(participants)
         d['n_messages'] = len(self.model_thread)
-        # d['subject'] = subject
         d['dstart'] = min_date
         d['dend'] = max_date
         d['duration'] = max_date - min_date
@@ -265,11 +251,11 @@ class UI:
         text = 'From {} to {}\n{}\n' \
                'Started by: {} <{}>\n' \
                'Msgs: {}, Participants: {}\n' \
-               '{}\n{}'
+               '{}'
         text = text.format(d['dstart'], d['dend'], d['duration'],
                            d['name'], d['email'],
                            d['n_messages'], d['n_participants'],
-                           d['subject'], d['url'])
+                           d['url'])
         start, end = self.details.get_bounds()
         self.details.delete(start, end)
         end = self.details.get_end_iter()
