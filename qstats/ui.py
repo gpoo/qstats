@@ -222,7 +222,7 @@ class UI:
         subject, container = model[storeiter][:2]
         self.subject.set_text(subject)
 
-        participants = set()
+        participants = {}
         t = ThreadIterator(container)
         for (i, (c, depth)) in enumerate(t.next(), 1):
             msg = parse_message(c.message)
@@ -236,10 +236,13 @@ class UI:
             self.model_thread[treeiter][3] = msg
             self.model_thread[treeiter][4] = is_generic
             self.model_thread[treeiter][5] = msg['date'].strftime('%x')
-            participants.add(msg['from'][0])
+            sender_name, sender_email,  = msg['from'][0]
+            participants.setdefault(sender_email, {'name': sender_name,
+                                                   'count': 0})
+            participants[sender_email]['count'] += 1
 
             if i == 1:
-                d['name'], d['email'] = msg['from'][0]
+                d['name'], d['email'] = sender_name, sender_email
                 min_date, max_date = msg['date'], msg['date']
 
             min_date = msg['date'] if msg['date'] < min_date else min_date
@@ -254,7 +257,7 @@ class UI:
         d['dend'] = max_date
         d['duration'] = max_date - min_date
 
-        print([x[1] for x in participants])
+        print({x: participants[x]['count'] for x in participants})
 
         text = 'From {} to {}\n{}\n' \
                'Started by: {} <{}>\n' \
