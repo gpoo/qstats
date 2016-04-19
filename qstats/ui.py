@@ -165,6 +165,7 @@ class UI:
         # self.remark.connect('changed', self.on_remark_changed)
 
         self.details = builder.get_object('textview_details').get_buffer()
+        self.subject = builder.get_object('lbl_subject')
 
         self.window.add_events(Gdk.EventType.KEY_PRESS |
                                Gdk.EventType.KEY_RELEASE)
@@ -221,6 +222,7 @@ class UI:
         # subject = model.get_value(storeiter, 0)
         # container = model.get_value(storeiter, 1)
         subject, container = model[storeiter][:2]
+        self.subject.set_text(subject)
 
         participants = set()
         t = ThreadIterator(container)
