@@ -67,19 +67,28 @@ class UI:
         sw.add(self.sourceview)
 
         sw = builder.get_object('sw_treeview_main')
-        self.model = Gtk.ListStore(str, GObject.TYPE_PYOBJECT)
+        self.model = Gtk.ListStore(str, GObject.TYPE_PYOBJECT, int, bool)
+        self.model_filter = self.model.filter_new()
+        self.model_filter.set_visible_func(self.model_filter_func)
+
         self.list_threads = Gtk.TreeView()
         self.list_threads.set_headers_visible(False)
-        self.list_threads.set_model(self.model)
+        self.list_threads.set_model(self.model_filter)
         self.add_accelerator(self.list_threads, '<alt>g', 'grab-focus')
         self.selinfo = self.list_threads.get_selection()
         self.selinfo.connect('changed', self.select_row)
 
         # Renderers for Threads
+        # renderer = Gtk.CellRendererText()
+        # renderer.set_property('ellipsize', Pango.EllipsizeMode.END)
+        # # renderer.set_property('xalign', 1.0)
+        # col = Gtk.TreeViewColumn('Thread id', renderer, text=0)
+        # col.set_resizable(True)
+        # self.list_threads.append_column(col)
+
         renderer = Gtk.CellRendererText()
-        renderer.set_property('ellipsize', Pango.EllipsizeMode.END)
-        # renderer.set_property('xalign', 1.0)
-        col = Gtk.TreeViewColumn('Thread id', renderer, text=0)
+        renderer.set_property('xalign', 1.0)
+        col = Gtk.TreeViewColumn('I', renderer, text=2)
         col.set_resizable(True)
         self.list_threads.append_column(col)
 
@@ -173,9 +182,9 @@ class UI:
         L = list(data.items())
         L.sort()
         regex = re.compile(r'\s+')
-        for subject, container in L:
+        for index, (subject, container) in enumerate(L, 1):
             subject = regex.sub(' ', subject).strip()
-            self.model.append([subject, container])
+            self.model.append([subject, container, index, True])
             # self.model.set_value(iter, 0, subject)
             # self.model.set_value(iter, 1, container)
 
@@ -185,6 +194,13 @@ class UI:
             self.cache_filtered_subject[subject] = [r for r in result]
 
         return self.cache_filtered_subject[subject]
+
+    def model_filter_func(self, model, iter, data):
+        '''Tests if the language in the row is the one in the filter'''
+        if model[iter][3] is not False:
+            return True
+        else:
+            return model[iter][3]
 
     def select_row(self, selection, *data):
         model, storeiter = selection.get_selected()
@@ -209,6 +225,8 @@ class UI:
         self.subject.set_text(subject)
 
         participants = {}
+        is_generic = False
+        topics = set()
         t = ThreadIterator(container)
         for (i, (c, depth)) in enumerate(t.next(), 1):
             msg = parse_message(c.message)
@@ -238,24 +256,32 @@ class UI:
             min_date = msg['date'] if msg['date'] < min_date else min_date
             max_date = msg['date'] if msg['date'] > max_date else max_date
 
-            print(topic)
+            if topic is not None:
+                for t in topic:
+                    topics.add(t)
 
         d['n_participants'] = len(participants)
         d['n_messages'] = len(self.model_thread)
-        d['dstart'] = min_date
-        d['dend'] = max_date
+        d['dstart'] = min_date.strftime('%d-%m-%Y')
+        d['dend'] = max_date.strftime('%d-%m-%Y')
         d['duration'] = max_date - min_date
 
-        print({x: participants[x]['count'] for x in participants})
+        model[storeiter][3] = is_generic
 
-        text = 'From {} to {}\n{}\n' \
-               'Started by: {} <{}>\n' \
+        # print({x: participants[x]['count'] for x in participants})
+        try:
+            theme = ', '.join(topics)
+        except:
+            print(topics)
+
+        text = u'{} to {}\n{}\n' \
+               '{} <{}>\n' \
                'Msgs: {}, Participants: {}\n' \
                '{}'
         text = text.format(d['dstart'], d['dend'], d['duration'],
                            d['name'], d['email'],
                            d['n_messages'], d['n_participants'],
-                           d['url'])
+                           theme)
         start, end = self.details.get_bounds()
         self.details.delete(start, end)
         end = self.details.get_end_iter()
