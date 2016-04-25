@@ -95,6 +95,12 @@ class UI:
         renderer.set_property('xalign', 1.0)
         col = Gtk.TreeViewColumn('I', renderer, text=2)
         col.set_resizable(True)
+        col.set_expand(True)
+        self.list_threads.append_column(col)
+
+        renderer = Gtk.CellRendererToggle()
+        # renderer.set_property('xalign', 0.0)
+        col = Gtk.TreeViewColumn('O', renderer, active=4)
         self.list_threads.append_column(col)
 
         sw.add(self.list_threads)
@@ -189,7 +195,7 @@ class UI:
         regex = re.compile(r'\s+')
         for index, (subject, container) in enumerate(L, 1):
             subject = regex.sub(' ', subject).strip()
-            self.model.append([subject, container, index, True])
+            self.model.append([subject, container, index, True, False])
             # self.model.set_value(iter, 0, subject)
             # self.model.set_value(iter, 1, container)
 
@@ -271,7 +277,11 @@ class UI:
         d['dend'] = max_date.strftime('%d-%m-%Y')
         d['duration'] = max_date - min_date
 
-        model[storeiter][3] = is_generic
+        # Check if any message in the thread is 'general'
+        model[storeiter][4] = 'openstack' in topics
+        is_generic_thread = len([x[4] for x in self.model_thread if x[4]]) > 0
+        model[storeiter][3] = is_generic_thread
+
 
         # print({x: participants[x]['count'] for x in participants})
         try:
