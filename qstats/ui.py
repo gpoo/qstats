@@ -67,7 +67,12 @@ class UI:
         sw.add(self.sourceview)
 
         sw = builder.get_object('sw_treeview_main')
-        self.model = Gtk.ListStore(str, GObject.TYPE_PYOBJECT, int, bool)
+        self.model = Gtk.ListStore(str,  # subject
+                                   GObject.TYPE_PYOBJECT,  # container
+                                   int,  # index
+                                   bool,  # is a general topic
+                                   bool  # is 'openstack' topic
+                                   )
         self.model_filter = self.model.filter_new()
         self.model_filter.set_visible_func(self.model_filter_func)
 
