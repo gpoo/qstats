@@ -62,7 +62,7 @@ class UI:
 
         self.sourceview = GtkSource.View.new_with_buffer(self.textbuffer)
         self.sourceview.set_wrap_mode(Gtk.WrapMode.WORD_CHAR)
-        self.sourceview.set_show_line_marks(True)
+        # self.sourceview.set_show_line_marks(True)
         self.add_accelerator(self.sourceview, '<alt>o', 'grab-focus')
         sw.add(self.sourceview)
 
