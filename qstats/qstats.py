@@ -1,7 +1,6 @@
 #!/usr/bin/env python
 
 import sys
-sys.path.insert(0, '/home/gpoo/code/research/ml/mailingliststat')
 
 import gzip
 import pickle

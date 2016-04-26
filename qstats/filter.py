@@ -1,8 +1,6 @@
 #!/usr/bin/env python
 #-*- coding:utf-8 -*-
 
-import sys
-sys.path.insert(0, '/home/gpoo/code/research/ml/mailingliststat')
 
 import six
 import json
