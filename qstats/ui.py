@@ -23,7 +23,6 @@ from __future__ import print_function
 
 import os.path
 import sys
-import codecs
 import csv
 import re
 import gi
@@ -262,7 +261,6 @@ class UI:
 
                 path = Gtk.TreePath.new_from_string('0')
                 self.selinfo_thread.select_path(path)
-                first_entry = False
 
             min_date = msg['date'] if msg['date'] < min_date else min_date
             max_date = msg['date'] if msg['date'] > max_date else max_date
@@ -281,7 +279,6 @@ class UI:
         model[storeiter][4] = 'openstack' in topics
         is_generic_thread = len([x[4] for x in self.model_thread if x[4]]) > 0
         model[storeiter][3] = is_generic_thread
-
 
         # print({x: participants[x]['count'] for x in participants})
         try:

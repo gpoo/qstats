@@ -1,13 +1,11 @@
 #!/usr/bin/env python
-#-*- coding:utf-8 -*-
+# -*- coding:utf-8 -*-
 
 
 import six
 import json
 import re
 import email
-from email.header import decode_header
-from email.utils import getaddresses, parsedate_tz
 from pymlstats.analyzer import ParseMessage
 
 
@@ -109,7 +107,6 @@ class Filter:
         L.sort()
         for subj, ctr in L:
             t = ThreadIterator(ctr)
-            s = re.sub('\s+', ' ', subj)
             for c, depth in t.next():
                 m = self.parse_message(c.message)
                 s_generic, topic = check_subject(m['subject'])
