@@ -1,12 +1,20 @@
 #!/usr/bin/env python
 # -*- coding:utf-8 -*-
 
+from __future__ import print_function
 
 import six
 import json
 import re
 import email
 from pymlstats.analyzer import ParseMessage
+
+
+class AliasesFilter:
+    aliases = {}
+    to_delete = {}
+    to_replace = {}
+    to_replace_regex = {}
 
 
 class Filter:
@@ -16,75 +24,60 @@ class Filter:
         self.aliases = self.load_aliases(aliases)
 
     def load_aliases(self, aliases):
-        inv_dict = {}
+        alias = AliasesFilter()
 
         if aliases is None:
-            return inv_dict
+            return alias
 
         with open(aliases, 'r') as f:
             data = json.load(f)
 
-        for k, value in iter(data.items()):
+        for k, value in iter(data['aliases'].items()):
             for a in value['alias']:
-                inv_dict.setdefault(a, {'email': k.lower(), 'name': value['name']})
-                # inv_dict[a] = {'email': k, 'name': value['name']}
+                alias.aliases.setdefault(a, {'email': k.lower(),
+                                             'name': value['name']})
+        alias.to_delete = data['name_delete']
+        alias.to_replace = data['name_replace']
+        # [[a.replace('\\', '\\\\'), b] for a, b in data['text_patterns']]
+        alias.to_replace_regex = data['name_patterns']
 
-        return inv_dict
+        return alias
 
-    def walk(self, container):
-        L = list(container.items())
-        L.sort()
-        for subj, ctr in L:
-            for topic, subject, depth in self.print_container(ctr):
-                sys.stdout.write(depth * ' ')
-                print('%s: %s' % (subject, topic))
-#            for depth, message in self.print_container(ctr):
-#                #sys.stdout.write(depth * ' ')
-#                sys.stdout.write(repr(message.subject))
-#                sys.stdout.write('\n')
-#            #    print ctr.message.subject
-#            # self.print_container(ctr)
+    def apply_aliases_extended(self, header):
+        def check_name_extended(name, aliases):
+            def str_regex_replace(s, pattern, new):
+                if six.PY2:
+                    s = re.sub(pattern, new, s.decode('utf-8'))
+                    return s.encode('utf-8')
+                else:
+                    return re.sub(pattern, new, s)
 
-    def print_container(self, container, depth=0, debug=False):
-        s_generic = False
-        topic = None
+            for pattern in aliases.to_delete:
+                name = name.replace(pattern, '')
 
-        if container.message:
-            sys.stdout.write(depth * ' ')
-            #sys.stdout.write(repr(container.message.subject))
-            #sys.stdout.write('\n')
-            msg = ParseMessage()
-            text = email.message_from_string(str(container.message.message))
-            message = msg.parse_message(text)
-            msg_from = message['from']
+            for pattern, new in aliases.to_replace:
+                # name = str_replace(name, pattern, new)
+                name = name.replace(pattern, new)
 
-            addr = self.apply_aliases(msg_from)
+            for pattern, new in aliases.to_replace_regex:
+                if re.match(pattern, name):
+                    name = str_regex_replace(name, pattern, new)
 
-            msg_subject = message['subject']
-            msg_subject = re.sub('\[openstack\-dev\]', '', msg_subject,
-                                 flags=re.IGNORECASE)
-            msg_subject = re.sub(r'\s+', ' ', msg_subject)
-            s_generic, topic = check_subject(msg_subject)
+            # Swap names if they come as 'Lastname, Firstname MiddleName'
+            name = ' '.join([s.strip() for s in reversed(name.split(','))])
 
-            if s_generic:
-                yield topic, msg_subject, depth
-                # sys.stdout.write(depth * ' ')
-                # print('%s %s: %s' % (s_generic, topic, msg_subject))
+            return name
 
-        for c in container.children:
-            self.print_container(c, depth+1, debug)
-
-    def apply_aliases(self, header):
         addresses = []
         for name, mail in header:
             alias = mail.lower()
-            if alias in self.aliases:
-                n_name = self.aliases[alias]['name']
-                n_mail = self.aliases[alias]['email'].lower()
+            if alias in self.aliases.aliases:
+                n_name = self.aliases.aliases[alias]['name']
+                n_mail = self.aliases.aliases[alias]['email'].lower()
             else:
                 n_name, n_mail = name, mail.lower()
 
-            n_name = check_name(n_name)
+            n_name = check_name_extended(n_name, self.aliases)
             addresses.append([name, mail, n_name, n_mail])
 
         return addresses
@@ -102,7 +95,7 @@ class Filter:
 
         return message
 
-    def walk2(self, container):
+    def walk(self, container):
         L = list(container.items())
         L.sort()
         for subj, ctr in L:
@@ -111,8 +104,26 @@ class Filter:
                 m = self.parse_message(c.message)
                 s_generic, topic = check_subject(m['subject'])
 
-                print depth * ' ',
-                print depth, s_generic, topic, m['subject']
+                print(depth * ' ', end='')
+                print(depth, s_generic, topic, m['subject'])
+
+    def walk_extended(self, container):
+        L = list(container.items())
+        L.sort()
+        for subj, ctr in L:
+            t = ThreadIterator(ctr)
+            for c, depth in t.next():
+                m = self.parse_message(c.message)
+                s_generic, topic = check_subject(m['subject'])
+
+                addr = self.apply_aliases_extended(m['from'])
+
+                print(depth * ' ', end='')
+                print(depth, s_generic, topic, m['subject'])
+                for n1, e1, n2, e2 in addr:
+                    if n1 != n2 or e1 != e2:
+                        print('%s %s <%s> -> %s <%s>' % (depth * ' ',
+                                                         n1, e1, n2, e2))
 
 
 class ThreadIterator():
@@ -174,118 +185,3 @@ def check_subject(subject):
             return False, None
     else:
         return True, ['openstack']
-
-
-def check_name(name):
-    '''
-    def str_replace(s, old, new):
-        return s.replace(pattern, new)
-#        if six.PY2:
-#             return s.decode('utf-8').replace(pattern, new).encode('utf-8')
-#        else:
-#            return s.replace(pattern, new)
-    '''
-
-    def str_regex_replace(s, pattern, new):
-        if six.PY2:
-            s = re.sub(pattern, new, s.decode('utf-8'))
-            return s.encode('utf-8')
-        else:
-            return re.sub(pattern, new, s)
-
-    to_delete = (
-                   '"',
-                   '\'',
-#                   u'\n',
-                   u'(CloudOS개발팀)', # CloudOS
-                   'Cloud OS R&D',
-                   'HP Cloud Services', # HP
-                   'HP Storage R&D',
-                   'HP Networking',
-                   'HPN R&D',
-                   'HP Servers',
-                   'HP Converged Cloud - Cloud OS',
-                   '-X bradjone - AAP3 INC@Cisco',  # Cisco
-                   '-X jodavidg - AAP3 INC@Cisco',
-                   '-X limao - YI JIN XIN XI FU WUSU ZHOUYOU XIAN GONG SI at\n Cisco',
-                   'Brazil R&D-ECL',
-                   'HPCS - Ft. Collins',
-                   'HPCS Fort Collins',
-                   'HPCS Quantum',
-                   'STSD',
-                   'Contractor',
-                   '<gfa>',
-                   'ESSN Storage MSDU',
-                   '/ NSN',
-                   'EXT-Tata Consultancy Ser - FI/Espoo',
-                   '(SDN Project)',
-                   'LARC-E301[SCIENCE SYSTEMS AND APPLICATIONS, INC]',
-                   'PNB Roseville',
-                   '-B39208',  # freescale
-                   '-B37839',
-                   '-B22160',
-                   '-B37207',
-                   'graflu0',
-                   ',ES-OCTO-HCC-CHINA-BJ',
-                   'EB SW Cloud - R&D - Corvallis',
-                   '71510',
-                   'Cloud Services',  # Generic?
-                )
-
-    to_replace = (
-                    ('michel.gauthier@bull.net', 'Michel Gauthier'),
-                    ('Surya_Prabhakar@Dell.com', 'Surya Prabhakar'),
-                    ('Greg_Jacobs@Dell.com', 'Greg Jacobs'),
-                    ('Phani_Achanta@DELL.com', 'Phani Achanta'),
-                    ('Rajesh_Mohan3@Dell.com', 'Rajesh Mohan3'),
-                    ('Surya_Prabhakar@Dell.com', 'Surya Prabhakar'),
-                    ('Greg_Jacobs@Dell.com', 'Greg Jacobs'),
-                    ('Yuling_C@DELL.com', 'Yuling C'),
-                    ('Rob_Hirschfeld@Dell.com', 'Rob Hirschfeld'),
-                    ('Arkady_Kanevsky@DELL.com', 'Arkady Kanevsky'),
-                    ('Stanislav_M@DELLTEAM.com', 'Stanislav M'),
-                    ('afe.young@gmail.com', 'Afe Young'),
-                    ('lzy.dev@gmail.com', 'Lzy Dev'),
-                    ('stuart.mclaren@hp.com', 'Stuart Mclaren'),
-                    ('andrew.melton@mailtrust.com', 'Andrew Melton'),
-                    ('thomas.morin@orange.com', 'Thomas Morin'),
-                    ('Rohit.Karajgi@ril.com', 'Rohit Karajgi'),
-                    ('jonathan_gershater@trendmicro.com', 'Jonathan Gershater'),
-                    ('venkatesh.nag@wipro.com', 'Venkatesh Nag'),
-                    # Alcatel
-                    ('MENDELSOHN, ITAI ITAI', 'Itai Mendelsohn'),
-                    ('SMIGIELSKI, Radoslaw Radoslaw', 'Radoslaw Smigielski'),
-                    ('SHAH, Ronak Ronak R', 'Ronak Shah'),
-                    ('Stein, Manuel Manuel', 'Manuel Stein'),
-                    ('ELISHA, Moshe Moshe', 'Moshe Elisha'),
-                    ('GROSZ, Maty Maty', 'Maty Grosz'),
-                    ('Vishal2 Agarwal', 'Vishal Agarwal'),
-                    # Red Hat
-                    ('marios@redhat.com', 'Marios Andreou'),
-                    ('sbauza@redhat.com', 'Sylvain Bauza'),
-                    ('tfreger@redhat.com', 'Toni Frege'),
-                    # Aegis
-                    ('michal@aegis.org.pl', 'Michal Smereczynski'),
-                )
-
-    to_replace_regex = (
-                    (r'Rochelle.*Grober.*', 'Rochelle Grober'),
-                    # StackStorm
-                    (r'Dmitri Zimine.*StackStorm', 'Dmitri Zimine'),
-                )
-
-    for pattern in to_delete:
-        name = name.replace(pattern, '')
-
-    for pattern, new in to_replace:
-        # name = str_replace(name, pattern, new)
-        name = name.replace(pattern, new)
-
-    for pattern, new in to_replace_regex:
-        if re.match(pattern, name):
-            name = str_regex_replace(name, pattern, new)
-
-    # Swap names if they come as 'Lastname, Firstname MiddleName'
-    name = ' '.join([s.strip() for s in reversed(name.split(','))])
-
-    return name

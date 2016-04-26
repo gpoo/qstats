@@ -18,7 +18,7 @@ def do_gui(fname, aliases, verbose=0):
 def do_filter(fname, aliases, verbose=0):
     o = load(fname)
     p = Filter(o, aliases)
-    p.walk2(o)
+    p.walk_extended(o)
 
 
 def do_load(fname, root_only=False, verbose=0):
