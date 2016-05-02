@@ -103,6 +103,7 @@ class UI:
         # renderer.set_property('xalign', 0.0)
         col = Gtk.TreeViewColumn('O', renderer, active=4)
         self.list_threads.append_column(col)
+        renderer.connect("toggled", self.on_list_thread_cell_toggled)
 
         sw.add(self.list_threads)
 
@@ -382,6 +383,15 @@ class UI:
         self.textbuffer.delete(start, end)
         end = self.textbuffer.get_end_iter()
         self.textbuffer.insert(end, body)
+
+    def on_list_thread_cell_toggled(self, *args):
+        '''
+        Manual change of a thread as general or not. Any change done
+        manually must overrule the automatic filter.
+
+        Not Implemented yet.
+        '''
+        pass
 
     def on_content_type_toggled(self, widget, *args):
         # Do something only if the user toggled the check box,
