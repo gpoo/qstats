@@ -188,6 +188,7 @@ class UI:
         builder.connect_signals(self)
 
 #       threads = sorted(self.threads.keys(), key=lambda x: int(x, 16))
+        self.ithread = self.load_threads_data_from_csv()
         self.load_model(threads)
 
     def load_threads_data_from_csv(self, input_file=None):
@@ -442,6 +443,8 @@ class UI:
             if response != Gtk.ResponseType.YES:
                 # Don't close the window, go back to the application
                 return True
+
+        self.save_meta(self.ithread)
 
         Gtk.main_quit(*args)
 
