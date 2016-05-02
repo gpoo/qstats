@@ -225,10 +225,7 @@ class UI:
 
     def model_filter_func(self, model, iter, data):
         '''Tests if the language in the row is the one in the filter'''
-        if model[iter][3] is not False:
-            return True
-        else:
-            return model[iter][3]
+        return model[iter][3]
 
     def select_row(self, selection, *data):
         model, storeiter = selection.get_selected()
@@ -296,7 +293,8 @@ class UI:
 
         # Check if any message in the thread is 'general'
         model[storeiter][4] = 'openstack' in topics
-        is_generic_thread = len([x[4] for x in self.model_thread if x[4]]) > 0
+        # is_generic_thread = len([x[4] for x in self.model_thread if x[4]]) > 0
+        is_generic_thread = 'openstack' in topics or len(topics) > 1
         model[storeiter][3] = is_generic_thread
 
         self.ithread[cid]['generic'] = is_generic_thread
