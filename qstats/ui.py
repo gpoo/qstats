@@ -219,10 +219,10 @@ class UI:
             return
 
         d = {
-            'n_participants': 0,
-            'n_messages': 0,
-            'dstart': 'start',
-            'dend': 'end',
+            '# participants': 0,
+            '# messages': 0,
+            'start': 'start',
+            'end': 'end',
             'name': 'name',
             'email': 'email',
             'duration': 'duration'
@@ -268,10 +268,10 @@ class UI:
                 for t in topic:
                     topics.add(t)
 
-        d['n_participants'] = len(participants)
-        d['n_messages'] = len(self.model_thread)
-        d['dstart'] = min_date.strftime('%d-%m-%Y')
-        d['dend'] = max_date.strftime('%d-%m-%Y')
+        d['# participants'] = len(participants)
+        d['# messages'] = len(self.model_thread)
+        d['start'] = min_date.strftime('%d-%m-%Y')
+        d['end'] = max_date.strftime('%d-%m-%Y')
         d['duration'] = max_date - min_date
 
         # Check if any message in the thread is 'general'
@@ -289,9 +289,9 @@ class UI:
                '{} <{}>\n' \
                'Msgs: {}, Participants: {}\n' \
                '{}'
-        text = text.format(d['dstart'], d['dend'], d['duration'],
+        text = text.format(d['start'], d['end'], d['duration'],
                            d['name'], d['email'],
-                           d['n_messages'], d['n_participants'],
+                           d['# messages'], d['# participants'],
                            theme)
         start, end = self.details.get_bounds()
         self.details.delete(start, end)
