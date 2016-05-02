@@ -221,7 +221,6 @@ class UI:
         d = {
             'n_participants': 0,
             'n_messages': 0,
-            'url': '',
             'dstart': 'start',
             'dend': 'end',
             'name': 'name',
