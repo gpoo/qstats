@@ -25,6 +25,7 @@ import os.path
 import sys
 import csv
 import re
+import collections
 import gi
 
 gi.require_version('GtkSource', '3.0')
@@ -40,6 +41,7 @@ class UI:
 
     def __init__(self, threads, output_file, ui='qstats.ui', *args):
         self.threads = threads
+        self.ithread = collections.OrderedDict()  # Internal dict of threads
         self.csv_file = output_file
         self.content_type = {}
         self.in_progress = False  # State for variable initialization
@@ -198,6 +200,22 @@ class UI:
             # self.model.set_value(iter, 0, subject)
             # self.model.set_value(iter, 1, container)
 
+            # Metadata per thread
+            ctn = container.message
+            msgid = 'None' if not ctn else ctn.message_id
+            cid = '{}-{}'.format(msgid, subject)
+
+            self.ithread.setdefault(cid, {'container': container,
+                                          'generic': False,
+                                          '# participants': 0,
+                                          '# messages': 0,
+                                          'start': '',
+                                          'end': '',
+                                          'email': '',
+                                          'duration': '0',
+                                          'index': index
+                                          })
+
     def get_message_id_by_subject(self, subject):
         if subject not in self.cache_filtered_subject:
             result = self.db.get_messages_id_by_filtered_subject(subject)
@@ -232,6 +250,8 @@ class UI:
 
         subject, container = model[storeiter][:2]
         self.subject.set_text(subject)
+        msgid = 'None' if not container.message else container.message.message_id
+        cid = '{}-{}'.format(msgid, subject)
 
         participants = {}
         is_generic = False
@@ -278,6 +298,15 @@ class UI:
         model[storeiter][4] = 'openstack' in topics
         is_generic_thread = len([x[4] for x in self.model_thread if x[4]]) > 0
         model[storeiter][3] = is_generic_thread
+
+        self.ithread[cid]['generic'] = is_generic_thread
+        self.ithread[cid]['# participants'] = d['# participants']
+        self.ithread[cid]['# messages'] = d['# messages']
+        self.ithread[cid]['start'] = d['start']
+        self.ithread[cid]['end'] = d['end']
+        self.ithread[cid]['duration'] = d['duration']
+        self.ithread[cid]['name'] = d['name']
+        self.ithread[cid]['email'] = d['email']
 
         # print({x: participants[x]['count'] for x in participants})
         try:
