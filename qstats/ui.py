@@ -190,6 +190,24 @@ class UI:
 #       threads = sorted(self.threads.keys(), key=lambda x: int(x, 16))
         self.load_model(threads)
 
+    def load_threads_data_from_csv(self, input_file=None):
+        filename = input_file or self.csv_file
+        threads_data = collections.OrderedDict()
+
+        if not os.path.isfile(filename):
+            return threads_data
+
+        try:
+            with open(filename, 'r') as fd:
+                reader = csv.DictReader(fd, quoting=csv.QUOTE_MINIMAL)
+                for row in reader:
+                    key = row.pop('id', None)
+                    threads_data[key] = row
+        except csv.Error as e:
+            print('Error reading file: %s' % e)
+
+        return threads_data
+
     def load_model(self, data):
         L = list(data.items())
         L.sort()
@@ -468,6 +486,30 @@ class UI:
                                  data['remark'], data['source']])
 
             self.is_modified = False
+
+    def save_meta(self, ithread, output_file=None):
+        filename = output_file or self.csv_file
+        try:
+            with open(filename, 'w') as fd:
+                fieldnames = ['index', 'id', 'generic', '# participants',
+                              '# messages', 'start', 'end', 'duration',
+                              'email']
+                writer = csv.DictWriter(fd, quoting=csv.QUOTE_MINIMAL,
+                                        fieldnames=fieldnames)
+                writer.writeheader()
+
+                for key, d in ithread.iteritems():
+                    o = dict(d)
+                    o['id'] = key
+                    # Remove fields that we don't want printed
+                    o.pop('container', None)
+                    o.pop('name', None)
+                    try:
+                        writer.writerow(o)
+                    except csv.Error as e:
+                        print('Error on writing %s:\n%s' % (key, e))
+        except csv.Error as e:
+            print('Error writing file: %s' % e)
 
     def main(self):
         self.window.show_all()
