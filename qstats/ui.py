@@ -40,7 +40,7 @@ class UI:
 
     def __init__(self, threads, output_file, ui='qstats.ui', *args):
         self.threads = threads
-        self.output_file = output_file
+        self.csv_file = output_file
         self.content_type = {}
         self.in_progress = False  # State for variable initialization
         self.is_modified = False  # State that requires saving the data
@@ -426,7 +426,7 @@ class UI:
         if not self.is_modified:
             return
 
-        with open(self.output_file, 'w') as fd:
+        with open(self.csv_file, 'w') as fd:
             writer = csv.writer(fd, quoting=csv.QUOTE_MINIMAL)
             writer.writerow(['id', 'Labels', 'Num_of_Files',
                              'Relationship between files', 'Content',
