@@ -147,6 +147,25 @@ class UI:
 
         sw.add(self.tree_thread)
 
+        self.category = builder.get_object('entry_topic')
+        category_completion = builder.get_object('entrycompletion_topic')
+        self.category_model = Gtk.ListStore(str)
+        category_completion.set_model(self.category_model)
+        category_completion.set_text_column(0)
+        for word in ['abc', 'def', 'ghi', 'jkl', 'mno',
+                     'pqr', 'stu', 'vwx', 'yz']:
+            self.category_model.append([word])
+
+
+        self.treeview_categories = builder.get_object('treeview_categories')
+        self.treeview_categories.set_model(self.category_model)
+        # self.add_accelerator(self.tree_thread, '<alt>t', 'grab-focus')
+        # self.selinfo_thread = self.tree_thread.get_selection()
+        # self.selinfo_thread.connect('changed', self.select_row_thread)
+        renderer = Gtk.CellRendererText()
+        # renderer.set_property('xalign', 1.0)
+        col = Gtk.TreeViewColumn('Category', renderer, text=0)
+        self.treeview_categories.append_column(col)
 
         self.remark = builder.get_object('textview_remarks').get_buffer()
         # self.remark.connect('changed', self.on_remark_changed)
@@ -217,6 +236,14 @@ class UI:
             self.cache_filtered_subject[subject] = [r for r in result]
 
         return self.cache_filtered_subject[subject]
+
+    def select_category(self, selection, *data):
+        model, treeiter = selection.get_selected()
+
+        if not treeiter:
+            return
+
+        self.category.set_text(model[treeiter][0])
 
     def model_filter_func(self, model, iter, data):
         '''Tests if the language in the row is the one in the filter'''
