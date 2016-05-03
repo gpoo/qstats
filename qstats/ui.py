@@ -152,8 +152,19 @@ class UI:
         self.category_model = Gtk.ListStore(str)
         category_completion.set_model(self.category_model)
         category_completion.set_text_column(0)
-        for word in ['abc', 'def', 'ghi', 'jkl', 'mno',
-                     'pqr', 'stu', 'vwx', 'yz']:
+        candidates = [
+                      'Announcement',
+                      'Expertise seeking',
+                      'Events',
+                      'Knowledge seeking',
+                      'Out of scope',
+                      'Proposals & discussions',
+                      'Reminders',
+                      'Request for comments',
+                      'Request for decision',
+                      'Other'
+                      ]
+        for word in candidates:
             self.category_model.append([word])
 
 
