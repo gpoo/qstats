@@ -147,32 +147,7 @@ class UI:
 
         sw.add(self.tree_thread)
 
-        self.content_type = {
-            'Code': builder.get_object('cb_code'),
-            'Test': builder.get_object('cb_test'),
-            'Class': builder.get_object('cb_class'),
-            'Template': builder.get_object('cb_template'),
-            'Command': builder.get_object('cb_command'),
-            'Function': builder.get_object('cb_function'),
-            'Fragment': builder.get_object('cb_fragment'),
-            'Note': builder.get_object('cb_note'),
-            'Log': builder.get_object('cb_log'),
-            'Configuration': builder.get_object('cb_configuration'),
-            'Diff': builder.get_object('cb_diff'),
-            'Documentation': builder.get_object('cb_documentation'),
-            'Data': builder.get_object('cb_data'),
-            'Blog': builder.get_object('cb_blog'),
-            'Non-technical': builder.get_object('cb_non_technical')
-        }
 
-        self.topology = {
-            'Single': builder.get_object('rb_single'),
-            'Siblings': builder.get_object('rb_siblings'),
-            'Reference': builder.get_object('rb_reference'),
-            'Generation': builder.get_object('rb_generation'),
-            'Test': builder.get_object('rb_test'),
-            'Attachment': builder.get_object('rb_attachment')
-        }
         self.remark = builder.get_object('textview_remarks').get_buffer()
         # self.remark.connect('changed', self.on_remark_changed)
 
@@ -393,24 +368,6 @@ class UI:
         '''
         pass
 
-    def on_content_type_toggled(self, widget, *args):
-        # Do something only if the user toggled the check box,
-        # not the program
-        if self.in_progress:
-            return
-
-        values = []
-
-        model_detail, iter = self.selinfo.get_selected()
-        thread_id = model_detail.get_value(iter, 0)
-
-        for label, w in self.content_type.items():
-            if w.get_active():
-                values.append(label)
-
-        self.threads[thread_id]['label'] = ';'.join(values)
-        self.is_modified = True
-
     def on_remark_changed(self, widget, *args):
         if self.in_progress:
             return
@@ -423,17 +380,6 @@ class UI:
 
         self.threads[thread_id]['remark'] = text
         self.is_modified = True
-
-    def on_topology_toggled(self, widget, *args):
-        if self.in_progress:
-            return
-
-        model_detail, iter = self.selinfo.get_selected()
-        thread_id = model_detail.get_value(iter, 0)
-
-        if widget.get_active():
-            self.threads[thread_id]['relation'] = widget.get_label().capitalize()
-            self.is_modified = True
 
     def on_window_delete_event(self, *args):
         """Release resources and quit the application."""
