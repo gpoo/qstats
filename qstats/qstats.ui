@@ -33,7 +33,16 @@
                     <property name="shadow_type">in</property>
                     <property name="min_content_width">180</property>
                     <child>
-                      <placeholder/>
+                      <object class="GtkTreeView" id="treeview_list_threads">
+                        <property name="visible">True</property>
+                        <property name="can_focus">True</property>
+                        <property name="reorderable">True</property>
+                        <child internal-child="selection">
+                          <object class="GtkTreeSelection" id="treeview-selection_list_threads">
+                            <signal name="changed" handler="select_row" swapped="no"/>
+                          </object>
+                        </child>
+                      </object>
                     </child>
                   </object>
                   <packing>

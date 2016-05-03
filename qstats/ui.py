@@ -67,7 +67,6 @@ class UI:
         self.add_accelerator(self.sourceview, '<alt>o', 'grab-focus')
         sw.add(self.sourceview)
 
-        sw = builder.get_object('sw_treeview_main')
         self.model = Gtk.ListStore(str,  # subject
                                    GObject.TYPE_PYOBJECT,  # container
                                    int,  # index
@@ -77,12 +76,13 @@ class UI:
         self.model_filter = self.model.filter_new()
         self.model_filter.set_visible_func(self.model_filter_func)
 
-        self.list_threads = Gtk.TreeView()
-        self.list_threads.set_headers_visible(False)
+        self.list_threads = builder.get_object('treeview_list_threads')
+        # self.list_threads = Gtk.TreeView()
+        # self.list_threads.set_headers_visible(False)
         self.list_threads.set_model(self.model_filter)
         self.add_accelerator(self.list_threads, '<alt>g', 'grab-focus')
-        self.selinfo = self.list_threads.get_selection()
-        self.selinfo.connect('changed', self.select_row)
+        # self.selinfo = self.list_threads.get_selection()
+        # self.selinfo.connect('changed', self.select_row)
 
         # Renderers for Threads
         # renderer = Gtk.CellRendererText()
@@ -94,18 +94,16 @@ class UI:
 
         renderer = Gtk.CellRendererText()
         renderer.set_property('xalign', 1.0)
-        col = Gtk.TreeViewColumn('I', renderer, text=2)
+        col = Gtk.TreeViewColumn('Index', renderer, text=2)
         col.set_resizable(True)
         col.set_expand(True)
         self.list_threads.append_column(col)
 
         renderer = Gtk.CellRendererToggle()
         # renderer.set_property('xalign', 0.0)
-        col = Gtk.TreeViewColumn('O', renderer, active=4)
+        col = Gtk.TreeViewColumn('Generic?', renderer, active=4)
         self.list_threads.append_column(col)
         renderer.connect("toggled", self.on_list_thread_cell_toggled)
-
-        sw.add(self.list_threads)
 
         # Messages per thread
         sw = builder.get_object('sw_treeview_detail')
