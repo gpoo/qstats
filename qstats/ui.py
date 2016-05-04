@@ -77,12 +77,8 @@ class UI:
         self.model_filter.set_visible_func(self.model_filter_func)
 
         self.list_threads = builder.get_object('treeview_list_threads')
-        # self.list_threads = Gtk.TreeView()
-        # self.list_threads.set_headers_visible(False)
         self.list_threads.set_model(self.model_filter)
         self.add_accelerator(self.list_threads, '<alt>g', 'grab-focus')
-        # self.selinfo = self.list_threads.get_selection()
-        # self.selinfo.connect('changed', self.select_row)
 
         # Renderers for Threads
         # renderer = Gtk.CellRendererText()
@@ -258,7 +254,7 @@ class UI:
         '''Tests if the language in the row is the one in the filter'''
         return model[iter][3]
 
-    def select_row(self, selection, *data):
+    def on_list_threads_select_row(self, selection, *data):
         model, storeiter = selection.get_selected()
 
         if not storeiter:

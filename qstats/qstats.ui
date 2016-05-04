@@ -39,7 +39,7 @@
                         <property name="reorderable">True</property>
                         <child internal-child="selection">
                           <object class="GtkTreeSelection" id="treeview-selection_list_threads">
-                            <signal name="changed" handler="select_row" swapped="no"/>
+                            <signal name="changed" handler="on_list_threads_select_row" swapped="no"/>
                           </object>
                         </child>
                       </object>
@@ -178,6 +178,7 @@
                         <property name="visible">True</property>
                         <property name="can_focus">True</property>
                         <property name="completion">entrycompletion_topic</property>
+                        <signal name="changed" handler="on_entry_topic_changed" swapped="no"/>
                       </object>
                       <packing>
                         <property name="expand">False</property>
