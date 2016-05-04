@@ -224,16 +224,20 @@ class UI:
             msgid = 'None' if not ctn else ctn.message_id
             cid = '{}-{}'.format(msgid, subject)
 
-            self.ithread.setdefault(cid, {'container': container,
-                                          'generic': False,
-                                          '# participants': 0,
-                                          '# messages': 0,
-                                          'start': '',
-                                          'end': '',
-                                          'email': '',
-                                          'duration': '0',
-                                          'index': index
-                                          })
+            if cid in self.ithread:
+                self.ithread[cid]['container'] = container
+            else:
+                self.ithread[cid] = {'container': container,
+                                     'generic': False,
+                                     '# participants': 0,
+                                     '# messages': 0,
+                                     'start': '',
+                                     'end': '',
+                                     'email': '',
+                                     'duration': '',
+                                     'index': index,
+                                     'category': ''
+                                     }
 
     def get_message_id_by_subject(self, subject):
         if subject not in self.cache_filtered_subject:
@@ -241,6 +245,19 @@ class UI:
             self.cache_filtered_subject[subject] = [r for r in result]
 
         return self.cache_filtered_subject[subject]
+
+    def on_entry_topic_changed(self, entry, *data):
+        selection = self.list_threads.get_selection()
+        model, treeiter = selection.get_selected()
+
+        if not treeiter:
+            return
+
+        subject, container = model[treeiter][:2]
+        msgid = 'None' if not container.message else container.message.message_id
+        cid = '{}-{}'.format(msgid, subject)
+
+        self.ithread[cid]['category'] = entry.get_text()
 
     def select_category(self, selection, *data):
         model, treeiter = selection.get_selected()
@@ -276,6 +293,8 @@ class UI:
         self.subject.set_text(subject)
         msgid = 'None' if not container.message else container.message.message_id
         cid = '{}-{}'.format(msgid, subject)
+
+        self.category.set_text(self.ithread[cid]['category'])
 
         participants = {}
         is_generic = False
@@ -478,7 +497,7 @@ class UI:
             with open(filename, 'w') as fd:
                 fieldnames = ['index', 'id', 'generic', '# participants',
                               '# messages', 'start', 'end', 'duration',
-                              'email']
+                              'email', 'category']
                 writer = csv.DictWriter(fd, quoting=csv.QUOTE_MINIMAL,
                                         fieldnames=fieldnames)
                 writer.writeheader()
