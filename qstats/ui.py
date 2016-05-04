@@ -214,9 +214,6 @@ class UI:
         regex = re.compile(r'\s+')
         for index, (subject, container) in enumerate(L, 1):
             subject = regex.sub(' ', subject).strip()
-            self.model.append([subject, container, index, True, False])
-            # self.model.set_value(iter, 0, subject)
-            # self.model.set_value(iter, 1, container)
 
             # Metadata per thread
             ctn = container.message
@@ -237,6 +234,12 @@ class UI:
                                      'index': index,
                                      'category': ''
                                      }
+
+            self.model.append([subject, container, index,
+                               self.ithread[cid]['generic'], False])
+            # self.model.set_value(iter, 0, subject)
+            # self.model.set_value(iter, 1, container)
+
 
     def get_message_id_by_subject(self, subject):
         if subject not in self.cache_filtered_subject:
