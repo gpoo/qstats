@@ -161,7 +161,6 @@ class UI:
         for word in candidates:
             self.category_model.append([word])
 
-
         self.treeview_categories = builder.get_object('treeview_categories')
         self.treeview_categories.set_model(self.category_model)
         # self.add_accelerator(self.tree_thread, '<alt>t', 'grab-focus')
