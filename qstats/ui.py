@@ -325,13 +325,7 @@ class UI:
         model[storeiter][3] = is_generic_thread
 
         self.ithread[cid]['generic'] = is_generic_thread
-        self.ithread[cid]['# participants'] = d['# participants']
-        self.ithread[cid]['# messages'] = d['# messages']
-        self.ithread[cid]['start'] = d['start']
-        self.ithread[cid]['end'] = d['end']
-        self.ithread[cid]['duration'] = d['duration']
-        self.ithread[cid]['name'] = d['name']
-        self.ithread[cid]['email'] = d['email']
+        self.ithread[cid].update(d)
 
         # print({x: participants[x]['count'] for x in participants})
         try:
