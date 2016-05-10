@@ -274,6 +274,25 @@ class UI:
         return model[iter][3]
 
     def on_list_threads_select_row(self, selection, *data):
+        def update_category(category):
+            '''
+               Set the text for entry and select/unselect the category
+               from the listview depending on the category given
+            '''
+            self.category.set_text(category)
+
+            selection = self.treeview_categories.get_selection()
+            model, category_iter = selection.get_selected()
+
+            if len(self.ithread[cid]['category']) == 0 and category_iter:
+                selection.unselect_iter(category_iter)
+                return
+
+            for row in model:
+                if category == row[0]:
+                    selection.select_iter(row.iter)
+                    return
+
         model, storeiter = selection.get_selected()
 
         if not storeiter:
@@ -296,7 +315,7 @@ class UI:
         msgid = 'None' if not container.message else container.message.message_id
         cid = '{}-{}'.format(msgid, subject)
 
-        self.category.set_text(self.ithread[cid]['category'])
+        update_category(self.ithread[cid]['category'])
 
         participants = {}
         is_generic = False
