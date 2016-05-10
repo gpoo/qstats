@@ -34,6 +34,7 @@ gi.require_version('Gtk', '3.0')
 from gi.repository import GObject, Gtk, Gdk, GtkSource, Pango
 
 from .filter import ThreadIterator, parse_message, check_subject
+import utils
 
 
 class UI:
@@ -494,6 +495,8 @@ class UI:
 
     def save_meta(self, ithread, output_file=None):
         filename = output_file or self.csv_file
+        utils.backup_file(filename)
+
         try:
             with open(filename, 'w') as fd:
                 fieldnames = ['index', 'id', 'generic', '# participants',
