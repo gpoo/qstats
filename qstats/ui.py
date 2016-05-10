@@ -240,7 +240,6 @@ class UI:
             # self.model.set_value(iter, 0, subject)
             # self.model.set_value(iter, 1, container)
 
-
     def get_message_id_by_subject(self, subject):
         if subject not in self.cache_filtered_subject:
             result = self.db.get_messages_id_by_filtered_subject(subject)

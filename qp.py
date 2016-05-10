@@ -11,7 +11,7 @@ from qstats.ui import UI
 def do_gui(fname, aliases, verbose=0):
     o = load(fname)
     # p = Filter(o, aliases)
-    ui = UI(o, 'output_file')
+    ui = UI(o, 'output_file.csv')
     ui.main()
 
 
