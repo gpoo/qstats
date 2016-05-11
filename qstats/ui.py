@@ -277,6 +277,13 @@ class UI:
         '''Tests if the language in the row is the one in the filter'''
         return model[iter][3]
 
+    def find_category_iter(self, category):
+        for row in self.category_model:
+            if category == row[0]:
+                return row.iter
+
+        return None
+
     def on_list_threads_select_row(self, selection, *data):
         def update_category(category):
             '''
