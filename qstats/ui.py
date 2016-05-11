@@ -261,13 +261,17 @@ class UI:
 
         self.ithread[cid]['category'] = entry.get_text()
 
+        self.is_modified = True
+
     def select_category(self, selection, *data):
         model, treeiter = selection.get_selected()
 
         if not treeiter:
             return
 
-        self.category.set_text(model[treeiter][0])
+        if model[treeiter][0] != self.category.get_text():
+            self.category.set_text(model[treeiter][0])
+            self.is_modified = True
 
     def model_filter_func(self, model, iter, data):
         '''Tests if the language in the row is the one in the filter'''
@@ -441,17 +445,15 @@ class UI:
                 # Don't close the window, go back to the application
                 return True
 
-        self.save_meta(self.ithread)
-
         Gtk.main_quit(*args)
 
     def on_window_key_press(self, window, event, *args):
-        """Handle global keystrokes to move the sliders"""
+        """Handle global keystrokes"""
 
         # We handle Ctrl
         if event.state != 0 and (event.state & Gdk.ModifierType.CONTROL_MASK):
             if event.keyval == Gdk.KEY_s:
-                self.save()
+                self.save(self.ithread)
             else:
                 return False
             return True
@@ -466,28 +468,10 @@ class UI:
             widget.add_accelerator(signal, self.accelerators, key, mod,
                                    Gtk.AccelFlags.VISIBLE)
 
-    def save(self):
+    def save(self, ithread, output_file=None):
         if not self.is_modified:
             return
 
-        with open(self.csv_file, 'w') as fd:
-            writer = csv.writer(fd, quoting=csv.QUOTE_MINIMAL)
-            writer.writerow(['id', 'Labels', 'Num_of_Files',
-                             'Relationship between files', 'Content',
-                             'Remark', 'Source'])
-
-            detail = sorted(self.threads.keys(), key=lambda x: int(x, 16))
-
-            for thread_id in detail:
-                data = self.threads[thread_id]
-                writer.writerow([thread_id, data['label'],
-                                 self.metadata[thread_id]['data']['fcount'],
-                                 data['relation'], data['content'],
-                                 data['remark'], data['source']])
-
-            self.is_modified = False
-
-    def save_meta(self, ithread, output_file=None):
         filename = output_file or self.csv_file
         utils.backup_file(filename)
 
@@ -510,6 +494,8 @@ class UI:
                         writer.writerow(o)
                     except csv.Error as e:
                         print('Error on writing %s:\n%s' % (key, e))
+
+                self.is_modified = False
         except csv.Error as e:
             print('Error writing file: %s' % e)
 
