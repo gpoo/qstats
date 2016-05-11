@@ -426,7 +426,7 @@ class UI:
         self.threads[thread_id]['remark'] = text
         self.is_modified = True
 
-    def on_window_delete_event(self, *args):
+    def on_window_delete(self, *args):
         """Release resources and quit the application."""
 
         msg = 'Do you really want to close the application?'
