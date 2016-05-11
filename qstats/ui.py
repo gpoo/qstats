@@ -386,31 +386,6 @@ class UI:
         end = self.details.get_end_iter()
         self.details.insert(end, text)
 
-    def set_content_type(self, gistid):
-        self.in_progress = True
-        detail = self.threads[gistid]
-        for w in self.content_type.values():
-            w.set_active(False)
-
-        if detail['label']:
-            for label in detail['label'].split(';'):
-                widget = self.content_type[label.capitalize()]
-                try:
-                    widget.set_active(True)
-                except KeyError:
-                    print(label, file=sys.stderr)
-                    print(widget, file=sys.stderr)
-
-        start, end = self.remark.get_bounds()
-        self.remark.delete(start, end)
-        end = self.remark.get_end_iter()
-        self.remark.insert(end, detail['remark'])
-
-        relation = detail['relation'] or 'Single'
-        self.topology[relation].set_active(True)
-
-        self.in_progress = False
-
     def select_row_thread(self, selection, *data):
         model, treeiter = selection.get_selected()
 
