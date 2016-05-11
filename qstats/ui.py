@@ -299,10 +299,9 @@ class UI:
                 selection.unselect_iter(category_iter)
                 return
 
-            for row in model:
-                if category == row[0]:
-                    selection.select_iter(row.iter)
-                    return
+            selected_category_iter = self.find_category_iter(category)
+            if selected_category_iter:
+                selection.select_iter(selected_category_iter)
 
         model, storeiter = selection.get_selected()
 
