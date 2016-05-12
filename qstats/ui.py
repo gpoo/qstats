@@ -147,20 +147,6 @@ class UI:
         self.category_model = Gtk.ListStore(str)
         category_completion.set_model(self.category_model)
         category_completion.set_text_column(0)
-        candidates = [
-                      'Announcement',
-                      'Expertise seeking',
-                      'Events',
-                      'Knowledge seeking',
-                      'Out of scope',
-                      'Proposals & discussions',
-                      'Reminders',
-                      'Request for comments',
-                      'Request for decision',
-                      'Other'
-                      ]
-        for word in candidates:
-            self.category_model.append([word])
 
         self.treeview_categories = builder.get_object('treeview_categories')
         self.treeview_categories.set_model(self.category_model)
@@ -190,6 +176,27 @@ class UI:
 #       threads = sorted(self.threads.keys(), key=lambda x: int(x, 16))
         self.ithread = self.load_threads_data_from_csv()
         self.load_model(threads)
+
+        # Fill categories
+        default_categories = set([
+              'Announcement',
+              'Expertise seeking',
+              'Events',
+              'Knowledge seeking',
+              'Out of scope',
+              'Proposals & discussions',
+              'Reminders',
+              'Request for comments',
+              'Request for decision',
+              'Other'
+              ])
+
+        # Look for categories in the file and not within the default ones
+        catf = [x['category'] for x in self.ithread.values() if x['category']]
+        categories = set(catf) | default_categories
+
+        for category in sorted(categories):
+            self.category_model.append([category])
 
     def load_threads_data_from_csv(self, input_file=None):
         filename = input_file or self.csv_file
