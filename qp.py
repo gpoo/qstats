@@ -8,10 +8,10 @@ from qstats.filter import Filter
 from qstats.ui import UI
 
 
-def do_gui(fname, aliases, verbose=0):
+def do_gui(fname, aliases, csv_file='datafile.csv', verbose=0):
     o = load(fname)
     # p = Filter(o, aliases)
-    ui = UI(o, 'output_file.csv')
+    ui = UI(o, csv_file)
     ui.main()
 
 
@@ -75,13 +75,14 @@ def main():
     gui_parser = subparsers.add_parser("gui", help=help_parse)
     gui_parser.add_argument("file", help='MBox Pickled')
     gui_parser.add_argument('-a', '--aliases', dest='aliases')
+    gui_parser.add_argument('-c', '--csv', dest='csv_file')
 
     # Parse
     opts = arger.parse_args()
 
     # Commands in alphabetical order
     if opts.command == 'gui':
-        do_gui(opts.file, opts.aliases, opts.verbose)
+        do_gui(opts.file, opts.aliases, opts.csv_file, opts.verbose)
 
     elif opts.command == 'filter':
         do_filter(opts.file, opts.aliases, opts.verbose)
