@@ -98,7 +98,7 @@ class UI:
 
         renderer = Gtk.CellRendererToggle()
         # renderer.set_property('xalign', 0.0)
-        col = Gtk.TreeViewColumn('Generic?', renderer, active=4)
+        col = Gtk.TreeViewColumn('OpenStack?', renderer, active=4)
         self.list_threads.append_column(col)
         renderer.connect("toggled", self.on_list_thread_cell_toggled)
 
