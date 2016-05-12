@@ -307,7 +307,7 @@ class UI:
             selection = self.treeview_categories.get_selection()
             model, category_iter = selection.get_selected()
 
-            if len(self.ithread[cid]['category']) == 0 and category_iter:
+            if len(category) == 0 and category_iter:
                 selection.unselect_iter(category_iter)
                 return
 
