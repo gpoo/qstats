@@ -297,6 +297,11 @@ class UI:
                Set the text for entry and select/unselect the category
                from the listview depending on the category given
             '''
+            prev_category = self.category.get_text()
+            if prev_category and category != prev_category and \
+               not self.find_category_iter(prev_category):
+                   self.category_model.append([prev_category])
+
             self.category.set_text(category)
 
             selection = self.treeview_categories.get_selection()
