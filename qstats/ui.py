@@ -74,11 +74,11 @@ class UI:
                                    bool,  # is a general topic
                                    bool  # is 'openstack' topic
                                    )
-        self.model_filter = self.model.filter_new()
-        self.model_filter.set_visible_func(self.model_filter_func)
+        model_filter = self.model.filter_new()
+        model_filter.set_visible_column(3)
 
         self.list_threads = builder.get_object('treeview_list_threads')
-        self.list_threads.set_model(self.model_filter)
+        self.list_threads.set_model(model_filter)
         self.add_accelerator(self.list_threads, '<alt>g', 'grab-focus')
 
         # Renderers for Threads
@@ -279,10 +279,6 @@ class UI:
         if model[treeiter][0] != self.category.get_text():
             self.category.set_text(model[treeiter][0])
             self.is_modified = True
-
-    def model_filter_func(self, model, iter, data):
-        '''Tests if the language in the row is the one in the filter'''
-        return model[iter][3]
 
     def find_category_iter(self, category):
         for row in self.category_model:
