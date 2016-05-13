@@ -72,7 +72,8 @@ class UI:
                                    GObject.TYPE_PYOBJECT,  # container
                                    int,  # index
                                    bool,  # is a general topic
-                                   bool  # is 'openstack' topic
+                                   bool, # is 'openstack' topic
+                                   str  # category
                                    )
         model_filter = self.model.filter_new()
         model_filter.set_visible_column(3)
@@ -89,18 +90,25 @@ class UI:
         # col.set_resizable(True)
         # self.list_threads.append_column(col)
 
+        renderer = Gtk.CellRendererToggle()
+        # renderer.set_property('xalign', 0.0)
+        col = Gtk.TreeViewColumn('OS?', renderer, active=4)
+        self.list_threads.append_column(col)
+        renderer.connect("toggled", self.on_list_thread_cell_toggled)
+
         renderer = Gtk.CellRendererText()
         renderer.set_property('xalign', 1.0)
-        col = Gtk.TreeViewColumn('Index', renderer, text=2)
+        col = Gtk.TreeViewColumn('Idx', renderer, text=2)
+        col.set_resizable(True)
+        col.set_expand(False)
+        self.list_threads.append_column(col)
+
+        renderer = Gtk.CellRendererText()
+        renderer.set_property('xalign', 0.0)
+        col = Gtk.TreeViewColumn('Category', renderer, text=5)
         col.set_resizable(True)
         col.set_expand(True)
         self.list_threads.append_column(col)
-
-        renderer = Gtk.CellRendererToggle()
-        # renderer.set_property('xalign', 0.0)
-        col = Gtk.TreeViewColumn('OpenStack?', renderer, active=4)
-        self.list_threads.append_column(col)
-        renderer.connect("toggled", self.on_list_thread_cell_toggled)
 
         # Messages per thread
         sw = builder.get_object('sw_treeview_detail')
@@ -244,7 +252,8 @@ class UI:
                                      }
 
             self.model.append([subject, container, index,
-                               self.ithread[cid]['generic'], False])
+                               self.ithread[cid]['generic'], False,
+                               self.ithread[cid]['category']])
             # self.model.set_value(iter, 0, subject)
             # self.model.set_value(iter, 1, container)
 
@@ -267,7 +276,7 @@ class UI:
         cid = '{}-{}'.format(msgid, subject)
 
         self.ithread[cid]['category'] = entry.get_text()
-
+        model[treeiter][5] = entry.get_text()
         self.is_modified = True
 
     def select_category(self, selection, *data):
