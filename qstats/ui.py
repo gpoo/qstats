@@ -65,7 +65,7 @@ class UI:
         self.sourceview = GtkSource.View.new_with_buffer(self.textbuffer)
         self.sourceview.set_wrap_mode(Gtk.WrapMode.WORD_CHAR)
         # self.sourceview.set_show_line_marks(True)
-        self.add_accelerator(self.sourceview, '<alt>o', 'grab-focus')
+        self.add_accelerator(self.sourceview, '<alt>3', 'grab-focus')
         sw.add(self.sourceview)
 
         self.model = Gtk.ListStore(str,  # subject
@@ -77,10 +77,11 @@ class UI:
                                    )
         model_filter = self.model.filter_new()
         model_filter.set_visible_column(3)
+        model_sorted_and_filtered = Gtk.TreeModelSort(model_filter)
 
         self.list_threads = builder.get_object('treeview_list_threads')
-        self.list_threads.set_model(model_filter)
-        self.add_accelerator(self.list_threads, '<alt>g', 'grab-focus')
+        self.list_threads.set_model(self.model)
+        self.add_accelerator(self.list_threads, '<alt>1', 'grab-focus')
 
         # Renderers for Threads
         # renderer = Gtk.CellRendererText()
@@ -121,7 +122,7 @@ class UI:
                                           )
         self.tree_thread = Gtk.TreeView()
         self.tree_thread.set_model(self.model_thread)
-        self.add_accelerator(self.tree_thread, '<alt>t', 'grab-focus')
+        self.add_accelerator(self.tree_thread, '<alt>2', 'grab-focus')
         self.selinfo_thread = self.tree_thread.get_selection()
         self.selinfo_thread.connect('changed', self.select_row_thread)
 
@@ -158,7 +159,7 @@ class UI:
 
         self.treeview_categories = builder.get_object('treeview_categories')
         self.treeview_categories.set_model(self.category_model)
-        # self.add_accelerator(self.tree_thread, '<alt>t', 'grab-focus')
+        self.add_accelerator(self.treeview_categories, '<alt>4', 'grab-focus')
         # self.selinfo_thread = self.tree_thread.get_selection()
         # self.selinfo_thread.connect('changed', self.select_row_thread)
         renderer = Gtk.CellRendererText()
