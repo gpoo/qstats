@@ -390,9 +390,9 @@ class UI:
         model[storeiter][4] = 'openstack' in topics
         # is_generic_thread = len([x[4] for x in self.model_thread if x[4]]) > 0
         is_generic_thread = 'openstack' in topics or len(topics) > 1
-        model[storeiter][3] = is_generic_thread
+        model[storeiter][3] = 'openstack' in topics
 
-        self.ithread[cid]['generic'] = is_generic_thread
+        self.ithread[cid]['generic'] = 'openstack' in topics # or len(topics) > 1
         self.ithread[cid].update(d)
 
         # print({x: participants[x]['count'] for x in participants})
