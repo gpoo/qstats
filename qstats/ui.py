@@ -382,9 +382,9 @@ class UI:
 
         d['# participants'] = len(participants)
         d['# messages'] = len(self.model_thread)
-        d['start'] = min_date.strftime('%d-%m-%Y')
-        d['end'] = max_date.strftime('%d-%m-%Y')
         d['duration'] = max_date - min_date
+        d['start'] = min_date.strftime('%Y-%m-%d')
+        d['end'] = max_date.strftime('%Y-%m-%d')
 
         # Check if any message in the thread is 'general'
         model[storeiter][4] = 'openstack' in topics
