@@ -244,7 +244,7 @@ class UI:
                                      'generic': False,
                                      '# participants': 0,
                                      '# messages': 0,
-                                     'start': '',
+                                     'begin': '',
                                      'end': '',
                                      'email': '',
                                      'duration': '',
@@ -329,7 +329,7 @@ class UI:
         d = {
             '# participants': 0,
             '# messages': 0,
-            'start': 'start',
+            'begin': 'begin',
             'end': 'end',
             'name': 'name',
             'email': 'email',
@@ -382,7 +382,7 @@ class UI:
 
         d['# participants'] = len(participants)
         d['# messages'] = len(self.model_thread)
-        d['start'] = min_date.strftime('%Y-%m-%d')
+        d['begin'] = min_date.strftime('%Y-%m-%d')
         d['end'] = max_date.strftime('%Y-%m-%d')
         d['duration'] = (max_date - min_date).days
 
@@ -405,7 +405,7 @@ class UI:
                '{} <{}>\n' \
                'Msgs: {}, Participants: {}\n' \
                '{}'
-        text = text.format(d['start'], d['end'], d['duration'],
+        text = text.format(d['begin'], d['end'], d['duration'],
                            d['name'], d['email'],
                            d['# messages'], d['# participants'],
                            theme)
@@ -502,7 +502,7 @@ class UI:
         try:
             with open(filename, 'w') as fd:
                 fieldnames = ['index', 'id', 'generic', '# participants',
-                              '# messages', 'start', 'end', 'duration',
+                              '# messages', 'begin', 'end', 'duration',
                               'email', 'category']
                 writer = csv.DictWriter(fd, quoting=csv.QUOTE_MINIMAL,
                                         fieldnames=fieldnames)
