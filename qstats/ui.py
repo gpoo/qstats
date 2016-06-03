@@ -76,12 +76,11 @@ class UI:
                                    str  # category
                                    )
         model_filter = self.model.filter_new()
-        model_filter.set_visible_column(3)
-        model_sorted_and_filtered = Gtk.TreeModelSort(model_filter)
+        # model_filter.set_visible_column(3)
 
         self.list_threads = builder.get_object('treeview_list_threads')
-        # self.list_threads.set_model(self.model)
-        self.list_threads.set_model(model_filter)
+        self.list_threads.set_model(self.model)
+        # self.list_threads.set_model(model_filter)
         self.add_accelerator(self.list_threads, '<alt>1', 'grab-focus')
 
         # Renderers for Threads
@@ -95,12 +94,14 @@ class UI:
         renderer = Gtk.CellRendererToggle()
         # renderer.set_property('xalign', 0.0)
         col = Gtk.TreeViewColumn('OS?', renderer, active=4)
+        col.set_sort_column_id(4)
         self.list_threads.append_column(col)
         renderer.connect("toggled", self.on_list_thread_cell_toggled)
 
         renderer = Gtk.CellRendererText()
         renderer.set_property('xalign', 1.0)
         col = Gtk.TreeViewColumn('Idx', renderer, text=2)
+        col.set_sort_column_id(2)
         col.set_resizable(True)
         col.set_expand(False)
         self.list_threads.append_column(col)
@@ -108,6 +109,7 @@ class UI:
         renderer = Gtk.CellRendererText()
         renderer.set_property('xalign', 0.0)
         col = Gtk.TreeViewColumn('Category', renderer, text=5)
+        col.set_sort_column_id(5)
         col.set_resizable(True)
         col.set_expand(True)
         self.list_threads.append_column(col)
