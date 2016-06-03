@@ -139,10 +139,10 @@ class UI:
         col = Gtk.TreeViewColumn('Date', renderer, text=5)
         self.tree_thread.append_column(col)
 
-        renderer = Gtk.CellRendererText()
-        renderer.set_property('xalign', 1.0)
-        col = Gtk.TreeViewColumn('L', renderer, text=2)
-        self.tree_thread.append_column(col)
+        # renderer = Gtk.CellRendererText()
+        # renderer.set_property('xalign', 1.0)
+        # col = Gtk.TreeViewColumn('L', renderer, text=2)
+        # self.tree_thread.append_column(col)
 
         renderer = Gtk.CellRendererToggle()
         renderer.set_property('xalign', 0.0)
