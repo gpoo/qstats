@@ -80,7 +80,8 @@ class UI:
         model_sorted_and_filtered = Gtk.TreeModelSort(model_filter)
 
         self.list_threads = builder.get_object('treeview_list_threads')
-        self.list_threads.set_model(self.model)
+        # self.list_threads.set_model(self.model)
+        self.list_threads.set_model(model_filter)
         self.add_accelerator(self.list_threads, '<alt>1', 'grab-focus')
 
         # Renderers for Threads
