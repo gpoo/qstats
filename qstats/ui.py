@@ -190,22 +190,10 @@ class UI:
         self.load_model(threads)
 
         # Fill categories
-        default_categories = set([
-              'Announcement',
-              'Expertise seeking',
-              'Events',
-              'Knowledge seeking',
-              'Out of scope',
-              'Proposals & discussions',
-              'Reminders',
-              'Request for comments',
-              'Request for decision',
-              'Other'
-              ])
 
         # Look for categories in the file and not within the default ones
         catf = [x['category'] for x in self.ithread.values() if x['category']]
-        categories = set(catf) | default_categories
+        categories = set(catf) # | default_categories
 
         for category in sorted(categories):
             self.category_model.append([category])
