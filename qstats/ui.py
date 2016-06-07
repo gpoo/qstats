@@ -186,7 +186,7 @@ class UI:
         builder.connect_signals(self)
 
 #       threads = sorted(self.threads.keys(), key=lambda x: int(x, 16))
-        self.ithread = self.load_threads_data_from_csv()
+        self.ithread = utils.load_threads_data_from_csv(self.csv_file)
         self.load_model(threads)
 
         # Fill categories
@@ -197,24 +197,6 @@ class UI:
 
         for category in sorted(categories):
             self.category_model.append([category])
-
-    def load_threads_data_from_csv(self, input_file=None):
-        filename = input_file or self.csv_file
-        threads_data = collections.OrderedDict()
-
-        if not os.path.isfile(filename):
-            return threads_data
-
-        try:
-            with open(filename, 'r') as fd:
-                reader = csv.DictReader(fd, quoting=csv.QUOTE_MINIMAL)
-                for row in reader:
-                    key = row.pop('id', None)
-                    threads_data[key] = row
-        except csv.Error as e:
-            print('Error reading file: %s' % e)
-
-        return threads_data
 
     def load_model(self, data):
         L = list(data.items())

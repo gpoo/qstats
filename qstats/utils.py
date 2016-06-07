@@ -18,6 +18,9 @@
 # 51 Franklin Street, Fifth Floor, Boston, MA 02110-1301 USA.
 
 import os
+import collections
+import csv
+
 
 def backup_file(filename):
     '''
@@ -47,3 +50,21 @@ def backup_file(filename):
                 return True
 
     return False
+
+
+def load_threads_data_from_csv(filename):
+    threads_data = collections.OrderedDict()
+
+    if not os.path.isfile(filename):
+        return threads_data
+
+    try:
+        with open(filename, 'r') as fd:
+            reader = csv.DictReader(fd, quoting=csv.QUOTE_MINIMAL)
+            for row in reader:
+                key = row.pop('id', None)
+                threads_data[key] = row
+    except csv.Error as e:
+        print('Error reading file: %s' % e)
+
+    return threads_data
