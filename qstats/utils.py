@@ -29,16 +29,21 @@ def backup_file(filename):
         name, version = os.path.splitext(filename)
 
         try:
-             num = int(version)
-             base = name
+            num = int(version)
+            base = name
         except ValueError:
-             base = filename
+            base = filename
+
+        try:
+            xrange
+        except NameError:
+            xrange = range
 
         # Find the next one
         for i in xrange(1000):
-             new_file = '%s.%03d' % (base, i)
-             if not os.path.isfile(new_file):
-                  os.rename(filename, new_file)
-                  return True
+            new_file = '%s.%03d' % (base, i)
+            if not os.path.isfile(new_file):
+                os.rename(filename, new_file)
+                return True
 
     return False
