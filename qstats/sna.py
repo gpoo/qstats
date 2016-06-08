@@ -27,6 +27,7 @@ import collections
 import utils
 from .filter import ThreadIterator, parse_message, apply_aliases
 
+
 class Network:
     def __init__(self, threads, csv_file, aliases, *args):
         self.threads = threads
@@ -67,7 +68,7 @@ class Network:
             # Some threads starts at a different depth. To make the threads
             # homogeneous, we make them all to start from 0.
             if i == 0 and depth != 0:
-               offset = depth
+                offset = depth
             depth = depth - offset
 
             msg = parse_message(c.message)
