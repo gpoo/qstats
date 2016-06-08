@@ -25,16 +25,17 @@ import re
 import collections
 
 import utils
-
+from .filter import ThreadIterator, parse_message, apply_aliases
 
 class Network:
-    def __init__(self, threads, csv_file, *args):
+    def __init__(self, threads, csv_file, aliases, *args):
         self.threads = threads
         self.ithread = collections.OrderedDict()  # Internal dict of threads
         self.csv_file = csv_file
         self.content_type = {}
         self.in_progress = False  # State for variable initialization
         self.is_modified = False  # State that requires saving the data
+        self.aliases = aliases
 
         self.ithread = utils.load_threads_data_from_csv(self.csv_file)
         self.load_thread_containers(threads)

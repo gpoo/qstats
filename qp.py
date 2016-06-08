@@ -4,7 +4,7 @@ import argparse
 import sys
 import codecs
 from qstats.qstats import parse, print_threads, print_roots, save, load
-from qstats.filter import Filter
+from qstats.filter import Filter, load_aliases
 from qstats.ui import UI
 from qstats.sna import Network
 
@@ -44,10 +44,11 @@ def do_parse(files, save_file, verbose=False):
         print_threads(subject_table)
 
 
-def do_social_network(fname, aliases, csv_file='datafile.csv', verbose=0):
+def do_social_network(fname, fname_aliases, csv_file='datafile.csv',
+                      verbose=False):
     o = load(fname)
-    # p = Filter(o, aliases)
-    n = Network(o, csv_file)
+    aliases = load_aliases(fname_aliases)
+    n = Network(o, csv_file, aliases)
     n.main()
 
 
