@@ -69,6 +69,8 @@ class Network:
             senders_and_recipients.update(r)
             names.update(n)
 
+        utils.print_flat_relations_gexf(pairs, senders_and_recipients, names)
+
     def do_process_thread(self, container):
         offset = 0
         sender = []
