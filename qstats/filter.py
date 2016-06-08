@@ -185,3 +185,71 @@ def check_subject(subject):
             return False, None
     else:
         return True, ['openstack']
+
+
+def load_aliases(aliases):
+    alias = AliasesFilter()
+
+    if aliases is None:
+        return alias
+
+    with open(aliases, 'r') as f:
+        data = json.load(f)
+
+    for k, value in iter(data['aliases'].items()):
+        for a in value['alias']:
+            alias.aliases.setdefault(a, {'email': k.lower(),
+                                         'name': value['name']})
+    alias.to_delete = data['name_delete']
+    alias.to_replace = data['name_replace']
+    # [[a.replace('\\', '\\\\'), b] for a, b in data['text_patterns']]
+    alias.to_replace_regex = data['name_patterns']
+
+    return alias
+
+
+def apply_aliases(header_from, aliases):
+    class Addresses:
+        def __init__(self, name, email, n_name, n_email):
+            self.name = name
+            self.email = email
+            self.normalized_name = n_name
+            self.normalized_email = n_email
+
+    def check_name_extended(name, aliases):
+        def str_regex_replace(s, pattern, new):
+            if six.PY2:
+                s = re.sub(pattern, new, s.decode('utf-8'))
+                return s.encode('utf-8')
+            else:
+                return re.sub(pattern, new, s)
+
+        for pattern in aliases.to_delete:
+            name = name.replace(pattern, '')
+
+        for pattern, new in aliases.to_replace:
+            # name = str_replace(name, pattern, new)
+            name = name.replace(pattern, new)
+
+        for pattern, new in aliases.to_replace_regex:
+            if re.match(pattern, name):
+                name = str_regex_replace(name, pattern, new)
+
+        # Swap names if they come as 'Lastname, Firstname MiddleName'
+        name = ' '.join([s.strip() for s in reversed(name.split(','))])
+
+        return name
+
+    addresses = []
+    for name, mail in header_from:
+        alias = mail.lower()
+        if alias in aliases.aliases:
+            n_name = aliases.aliases[alias]['name']
+            n_mail = aliases.aliases[alias]['email'].lower()
+        else:
+            n_name, n_mail = name, mail.lower()
+
+        n_name = check_name_extended(n_name, aliases)
+        addresses.append(Addresses(name, mail, n_name, n_mail))
+
+    return addresses
