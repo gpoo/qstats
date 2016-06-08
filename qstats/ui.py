@@ -226,7 +226,8 @@ class UI:
                                      }
 
             self.model.append([subject, container, index,
-                               self.ithread[cid]['generic'], False,
+                               self.ithread[cid]['generic'] == 'True',
+                               self.ithread[cid]['generic'] == 'True',
                                self.ithread[cid]['category']])
             # self.model.set_value(iter, 0, subject)
             # self.model.set_value(iter, 1, container)
