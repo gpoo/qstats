@@ -32,9 +32,6 @@ class Network:
         self.threads = threads
         self.ithread = collections.OrderedDict()  # Internal dict of threads
         self.csv_file = csv_file
-        self.content_type = {}
-        self.in_progress = False  # State for variable initialization
-        self.is_modified = False  # State that requires saving the data
         self.aliases = aliases
 
         self.ithread = utils.load_threads_data_from_csv(self.csv_file)
