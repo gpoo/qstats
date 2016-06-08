@@ -250,9 +250,10 @@ class UI:
         msgid = 'None' if not container.message else container.message.message_id
         cid = '{}-{}'.format(msgid, subject)
 
-        self.ithread[cid]['category'] = entry.get_text()
-        model[treeiter][5] = entry.get_text()
-        self.is_modified = True
+        if self.ithread[cid]['category'] != entry.get_text():
+            self.ithread[cid]['category'] = entry.get_text()
+            model[treeiter][5] = entry.get_text()
+            self.is_modified = True
 
     def select_category(self, selection, *data):
         model, treeiter = selection.get_selected()
