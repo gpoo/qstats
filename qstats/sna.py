@@ -56,14 +56,27 @@ class Network:
                 print('%s does not exists' % cid)
 
     def main(self):
+        pairs = collections.Counter()
+        senders_and_recipients = collections.Counter()
+        names = {}
+
         for cid, data in self.ithread.iteritems():
             if data['generic'] != 'True' or data['category'] != 'Other':
                 continue
-            self.do_process_thread(data['container'])
+            p, s, r, n = self.do_process_thread(data['container'])
+            pairs.update(p)
+            senders_and_recipients.update(s)
+            senders_and_recipients.update(r)
+            names.update(n)
 
     def do_process_thread(self, container):
         offset = 0
         sender = []
+        senders = []
+        recipients = []
+        interactions = []
+        names = {}
+
         for (i, (c, depth)) in enumerate(ThreadIterator(container).next()):
             # Some threads starts at a different depth. To make the threads
             # homogeneous, we make them all to start from 0.
@@ -80,7 +93,14 @@ class Network:
             else:
                 sender[depth] = addr.normalized_email
 
+            names[addr.normalized_email] = addr.normalized_name
+
             # Print only when there is a reply and it corresponds to a
             # different person
             if depth > 0 and sender[depth] != sender[depth-1]:
-                print(' '*depth, '%s -> %s' % (sender[depth], sender[depth-1]))
+                key = '%s -> %s' % (sender[depth], sender[depth-1])
+                interactions.append(key)
+                senders.append(sender[depth])
+                recipients.append(sender[depth-1])
+
+        return interactions, senders, recipients, names
