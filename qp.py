@@ -6,6 +6,7 @@ import codecs
 from qstats.qstats import parse, print_threads, print_roots, save, load
 from qstats.filter import Filter
 from qstats.ui import UI
+from qstats.sna import Network
 
 
 def do_gui(fname, aliases, csv_file='datafile.csv', verbose=0):
@@ -43,6 +44,13 @@ def do_parse(files, save_file, verbose=False):
         print_threads(subject_table)
 
 
+def do_social_network(fname, aliases, csv_file='datafile.csv', verbose=0):
+    o = load(fname)
+    # p = Filter(o, aliases)
+    n = Network(o, csv_file)
+    n.main()
+
+
 def main():
     sys.stdout = codecs.getwriter('utf-8')(sys.stdout)
 
@@ -77,6 +85,11 @@ def main():
     gui_parser.add_argument('-a', '--aliases', dest='aliases')
     gui_parser.add_argument('-c', '--csv', dest='csv_file')
 
+    sna_parser = subparsers.add_parser("sna", help=help_parse)
+    sna_parser.add_argument("file", help='MBox Pickled')
+    sna_parser.add_argument('-a', '--aliases', dest='aliases')
+    sna_parser.add_argument('-c', '--csv', dest='csv_file')
+
     # Parse
     opts = arger.parse_args()
 
@@ -92,6 +105,9 @@ def main():
 
     elif opts.command == 'report':
         do_load(opts.file, opts.root, opts.verbose)
+
+    elif opts.command == 'sna':
+        do_social_network(opts.file, opts.aliases, opts.csv_file, opts.verbose)
 
     else:
         # argparse will error on unexpected commands, but
