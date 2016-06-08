@@ -68,3 +68,56 @@ def load_threads_data_from_csv(filename):
         print('Error reading file: %s' % e)
 
     return threads_data
+
+
+def gexf_header_and_footer(fn):
+    def wrapper(*args, **kwargs):
+        header = '''<?xml version="1.0" encoding="UTF-8"?>
+<gexf xmlns="http://www.gexf.net/1.2draft"
+      xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+      xsi:schemaLocation="http://www.gexf.net/1.2draft
+                          http://www.gexf.net/1.2draft/gexf.xsd"
+      version="1.2">
+<graph mode="static" defaultedgetype="directed">
+<attributes class="node">
+  <attribute id="1" title="dev" type="string" />
+  <attribute id="2" title="messages" type="integer" />
+</attributes>
+<attributes class="edge">
+  <attribute id="3" title="interactions" type="integer" />
+</attributes>
+<nodes>'''
+        print(header)
+        fn(*args, **kwargs)
+        print('</nodes></graph></gexf>')
+    return wrapper
+
+
+@gexf_header_and_footer
+def print_flat_relations_gexf(edges, nodes, labels, threshold=0, sep=' -> '):
+    for key, count in nodes.iteritems():
+        if count <= threshold:
+            continue
+
+        label = key if key not in labels else labels[key]
+
+        xml = u'<node id="{key}" label="{label}">\n'\
+              '  <attvalues><attvalue for="1" value="{key}" />\n'\
+              '  <attvalue for="2" value="{count}" /></attvalues>'\
+              '</node>'.format(key=key, count=count, label=label)
+
+        print(xml)
+
+    print('<edges>')
+
+    for (edge_id, (key, v)) in enumerate(edges.iteritems(), 1):
+        if v <= threshold:
+            continue
+
+        source, target = key.split(sep)
+
+        edge = '<edge id="{edge_id}" source="{source}" target="{target}">\n'\
+               '  <attvalues><attvalue for="3" value="{v}" /></attvalues>'\
+               '</edge>'.format(**locals())
+        print(edge)
+    print('</edges>')
