@@ -56,5 +56,30 @@ class Network:
 
     def main(self):
         for cid, data in self.ithread.iteritems():
-            if data['generic'] == 'True' and data['category'] != 'Other':
-                print(data['container'])
+            if data['generic'] != 'True' or data['category'] != 'Other':
+                continue
+            self.do_process_thread(data['container'])
+
+    def do_process_thread(self, container):
+        offset = 0
+        sender = []
+        for (i, (c, depth)) in enumerate(ThreadIterator(container).next()):
+            # Some threads starts at a different depth. To make the threads
+            # homogeneous, we make them all to start from 0.
+            if i == 0 and depth != 0:
+               offset = depth
+            depth = depth - offset
+
+            msg = parse_message(c.message)
+            # Because is the 'From' header, we expect only one address
+            addr = apply_aliases(msg['from'], self.aliases)[0]
+
+            if len(sender) <= depth:
+                sender.append(addr.normalized_email)
+            else:
+                sender[depth] = addr.normalized_email
+
+            # Print only when there is a reply and it corresponds to a
+            # different person
+            if depth > 0 and sender[depth] != sender[depth-1]:
+                print(' '*depth, '%s -> %s' % (sender[depth], sender[depth-1]))
